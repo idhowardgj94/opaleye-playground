@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "OpaleyePlaygourd:lib"
+
+    - path: "./app/Main.hs"
+      component: "OpaleyePlaygourd:exe:OpaleyePlaygourd-exe"
+
+    - path: "./app/Paths_OpaleyePlaygourd.hs"
+      component: "OpaleyePlaygourd:exe:OpaleyePlaygourd-exe"
+
+    - path: "./test"
+      component: "OpaleyePlaygourd:test:OpaleyePlaygourd-test"

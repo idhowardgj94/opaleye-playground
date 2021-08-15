@@ -61,6 +61,40 @@ runTodoSelect :: PGS.Connection
                            FieldNullable SqlText)
               -> IO [(Int, String, Bool, LocalTime, String, Maybe String)]
 runTodoSelect = runSelect
+
+runTodoSelect' :: PGS.Connection
+              -> Select TodoListField
+              -> IO [TodoList]
+runTodoSelect' = runSelect 
+-- try record type.
+-- use polymorphic to field , and use type synonyms when need to use concrete types.
+data TodoList' a b c d e f = TodoList 
+                           { uid :: a
+                           , topic :: b
+                           , is_done :: c
+                           , created_time :: d
+                           , content :: e
+                           , ps :: f
+                          } deriving (Show)
+type TodoList = TodoList' Int String Bool LocalTime String (Maybe String)
+type TodoListField = TodoList' (Field SqlInt4) (Field SqlText) (Field SqlBool) (Field SqlTimestamp) (Field SqlText) (FieldNullable SqlText)
+-- use haskell templae to derive instances so my data can work with typeclass.
+$(makeAdaptorAndInstance "pTodoList" ''TodoList')
+
+-- let's try it out
+todoListTable' :: Table TodoListField TodoListField
+todoListTable' = table  "todo_lists" (pTodoList TodoList { uid = tableField "id"
+                                                         , topic = tableField "topic"
+                                                         , is_done = tableField "is_done"
+                                                         , created_time = tableField "created_time"
+                                                         , content = tableField "content"
+                                                         , ps = tableField "ps"
+                                                         })
+
+
+todoSelect' :: Select TodoListField
+todoSelect' = selectTable todoListTable'
+
 main :: IO ()
 main = do
     putStrLn "let play something fun!"
